@@ -302,7 +302,7 @@
       var go = KM.btn('Import', 'primary');
       form.appendChild(back); form.appendChild(go);
       clear(wrap); wrap.appendChild(form);
-      back.addEventListener('click', function () { clear(wrap); var w = E('div'); w.appendChild(E('p', 'muted', 'Unmanaged scripts in /data/adb/service.d.')); wrap.appendChild(w); });
+      back.addEventListener('click', function () { renderImport(host, sh); });
       go.addEventListener('click', function () {
         var n = name.value.trim(), sp = stop.value.trim();
         if (!validText(n, 64)) { KM.showError(err, { code: 'E_ARG', msg: 'Name is required.' }); return; }

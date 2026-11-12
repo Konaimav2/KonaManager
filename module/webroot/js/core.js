@@ -291,7 +291,7 @@
       setBlocking: function (v) {
         KM.S.modalBlocking = !!v;
         panel.setAttribute('aria-busy', v ? 'true' : 'false');
-        var b = panel.querySelector('.modal-backdrop'); if (b) b.style.pointerEvents = v ? 'none' : '';
+        var b = document.querySelector('#modal-root .modal-backdrop'); if (b) b.style.pointerEvents = v ? 'none' : '';
       },
       onClose: opts.onClose || null,
       onKey: function (ev) {
