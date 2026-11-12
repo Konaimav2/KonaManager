@@ -1,0 +1,17 @@
+id=sim-monitor
+name=SIM Monitor
+desc=Watches SIM and mobile-data state
+kind=daemon
+source=builtin
+start=@ADB@/service.d/sim-monitor.sh
+boot_script=@ADB@/service.d/sim-monitor.sh
+stop=cmd:@ADB@/sim-monitor/sim-monitor.sh stop
+argv_match=@ADB@/sim-monitor/sim-monitor.sh
+stop_scope=marker
+start_timeout=15
+stop_grace=8
+health=proc
+boot=xbit
+removable=0
+adopt=argv
+log=@ADB@/sim-monitor/sim-monitor.log

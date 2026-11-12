@@ -1,0 +1,11 @@
+reference/
+local/
+build/*.zip
+build/*.sha256
+*.tgz
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vscode/

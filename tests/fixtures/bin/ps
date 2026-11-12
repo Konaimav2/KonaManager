@@ -1,0 +1,4 @@
+#!/bin/sh
+# stub: prints $AG_STUB/ps.txt (uid pid args)
+echo "UID PID ARGS"
+cat "$AG_STUB/ps.txt"

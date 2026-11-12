@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080b0f">
+  <title>KonaManager - Simple Daemon Manager</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <script src="js/core.js" defer></script>
+  <script src="js/daemons.js" defer></script>
+  <script src="js/appguard.js" defer></script>
+  <script src="js/add.js" defer></script>
+  <script src="js/misc.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="30" height="30" rx="8" class="mk-bg"></rect>
+          <path d="M11 8v16M11 16l9-8M11 16l9 8" class="mk-k"></path>
+          <circle cx="22" cy="16" r="2.4" class="mk-dot"></circle>
+        </svg>
+        <div class="brand-text">
+          <h1>KonaManager</h1>
+          <p>Simple Daemon Manager</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="conn-chip" class="chip conn-chip" data-state="wait">checking</span>
+        <button id="refresh" class="icon-btn" type="button" aria-label="Refresh current tab">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11.5a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav id="tabs" class="tabs" role="tablist" aria-label="KonaManager sections">
+    <button class="tab" id="tab-daemons" role="tab" aria-selected="true" aria-controls="panel-daemons" data-tab="daemons" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="4.5" width="17" height="6" rx="2"></rect><rect x="3.5" y="13.5" width="17" height="6" rx="2"></rect><path d="M7 7.5h.01M7 16.5h.01"></path></svg>
+      <span>Daemons</span>
+    </button>
+    <button class="tab" id="tab-appguard" role="tab" aria-selected="false" aria-controls="panel-appguard" data-tab="appguard" tabindex="-1" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 19 6v5.2c0 4.4-2.9 7.6-7 9.3-4.1-1.7-7-4.9-7-9.3V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+      <span>AppGuard</span>
+    </button>
+    <button class="tab" id="tab-logs" role="tab" aria-selected="false" aria-controls="panel-logs" data-tab="logs" tabindex="-1" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="4.5" width="17" height="15" rx="2"></rect><path d="m7 10 2.5 2L7 14M12.5 15H17"></path></svg>
+      <span>Logs</span>
+    </button>
+    <button class="tab" id="tab-about" role="tab" aria-selected="false" aria-controls="panel-about" data-tab="about" tabindex="-1" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+      <span>About</span>
+    </button>
+  </nav>
+
+  <main id="main" class="main">
+    <section class="panel" id="panel-daemons" role="tabpanel" aria-labelledby="tab-daemons">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Local root daemons</p>
+          <h2>Daemons</h2>
+        </div>
+        <div class="section-actions">
+          <span id="daemon-count" class="count">-</span>
+          <button id="add-daemon" class="btn primary" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"></path></svg>
+            <span>Add</span>
+          </button>
+        </div>
+      </div>
+      <div id="daemon-error" class="alert" role="alert" hidden></div>
+      <div id="daemon-list" class="cards" aria-busy="true"></div>
+    </section>
+
+    <section class="panel" id="panel-appguard" role="tabpanel" aria-labelledby="tab-appguard" hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Idle app watchdog</p>
+          <h2>AppGuard</h2>
+        </div>
+        <div class="section-actions">
+          <span id="ag-count" class="count">-</span>
+        </div>
+      </div>
+      <div id="ag-error" class="alert" role="alert" hidden></div>
+      <div id="ag-status" class="ag-status"></div>
+      <div class="ag-grid">
+        <div class="ag-column">
+          <section class="panel-block" id="ag-controls"></section>
+          <section class="panel-block" id="ag-actions"></section>
+          <section class="panel-block" id="ag-result"></section>
+          <section class="panel-block" id="ag-never"></section>
+        </div>
+        <div class="ag-column">
+          <section class="panel-block" id="ag-targets"></section>
+          <section class="panel-block" id="ag-kills"></section>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-logs" role="tabpanel" aria-labelledby="tab-logs" hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Recent output</p>
+          <h2>Logs</h2>
+        </div>
+        <div class="section-actions">
+          <span id="log-source-note" class="count">dm</span>
+        </div>
+      </div>
+      <div class="log-controls">
+        <label class="field">
+          <span>Source</span>
+          <select id="log-source"></select>
+        </label>
+        <label class="field">
+          <span>Lines</span>
+          <select id="log-lines">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="200">200</option>
+          </select>
+        </label>
+        <button id="log-refresh" class="btn" type="button">Refresh</button>
+        <label class="check"><input id="log-auto" type="checkbox"> <span>Auto every 5s</span></label>
+      </div>
+      <div id="log-error" class="alert" role="alert" hidden></div>
+      <pre id="log-output" class="log-output" role="log" tabindex="0" aria-live="polite">Open the Logs tab and press Refresh.</pre>
+    </section>
+
+    <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Build and environment</p>
+          <h2>About</h2>
+        </div>
+      </div>
+      <div class="about-grid">
+        <section class="panel-block" id="about-identity"></section>
+        <section class="panel-block" id="about-doctor"></section>
+        <section class="panel-block" id="about-maint"></section>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+KonaManager v2 backend tests
+date: 2026-11-12T15:30:52Z
+host: Linux 6.8.0-147-generic x86_64
+shell: /usr/bin/dash
+
+ok   [create] import list: script is a candidate again
+
+dm calls checked against the JSON contract: 261 (violations: 0)
+TOTAL: 638 passed, 0 failed

@@ -1,0 +1,9 @@
+#!/bin/sh
+# stub: pm list packages -3 [--user N]
+user=0
+while [ $# -gt 0 ]; do [ "$1" = "--user" ] && user=$2; shift; done
+if [ "$user" = 999 ]; then
+  printf 'package:com.whatsapp\r\npackage:id.dana\r\npackage:com.u999.only\r\n'
+else
+  printf 'package:com.spotify.music\npackage:com.instagram.android\npackage:com.termux\npackage:com.plain.app\n'
+fi

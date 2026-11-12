@@ -1,0 +1,16 @@
+id=wifi-ps-guard
+name=Wi-Fi Power Save Guard
+desc=Keeps Wi-Fi power save disabled while an SSH session is active
+kind=daemon
+source=builtin
+start=@ADB@/service.d/wifi-ps-guard.sh
+boot_script=@ADB@/service.d/wifi-ps-guard.sh
+argv_match=@ADB@/service.d/wifi-ps-guard.sh
+stop_scope=marker
+start_timeout=8
+stop_grace=5
+health=proc
+boot=xbit
+removable=0
+adopt=argv
+log=@ADB@/wifi-ps-guard.log

@@ -1,0 +1,16 @@
+id=deep-sleep-cool
+name=Deep Sleep Cool
+desc=Freezes background apps when the screen is off (while charging, or always if enabled)
+kind=daemon
+source=builtin
+start=@ADB@/service.d/deep-sleep-cool.sh
+boot_script=@ADB@/service.d/deep-sleep-cool.sh
+argv_match=@ADB@/service.d/deep-sleep-cool.sh
+stop_scope=marker
+start_timeout=8
+stop_grace=5
+health=proc
+boot=xbit
+removable=0
+adopt=argv
+log=@R@/deep-sleep-cool.log

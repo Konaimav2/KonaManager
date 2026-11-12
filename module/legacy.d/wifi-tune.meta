@@ -1,0 +1,12 @@
+id=wifi-tune
+name=Wi-Fi TCP Tune
+desc=Applies TCP keepalive sysctls and power save off at boot
+kind=oneshot
+source=builtin
+start=@ADB@/service.d/wifi-tune.sh
+boot_script=@ADB@/service.d/wifi-tune.sh
+argv_match=@ADB@/service.d/wifi-tune.sh
+start_timeout=25
+boot=xbit
+removable=0
+log=@ADB@/wifi-tune.log

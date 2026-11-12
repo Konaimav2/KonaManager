@@ -1,0 +1,97 @@
+#!/system/bin/sh
+# dm - KonaManager daemon manager (v2). Every command prints exactly one JSON
+# object on stdout; exit 0 when ok:true, 1 when ok:false. Stderr stays empty.
+#
+#   dm list | status <id> | start <id> | stop <id> | restart <id> | boot <id>
+#   dm enable <id> | disable <id> [--keep-running]
+#   dm logs <id|dm|appguard> [n] | doctor | version | migrate [--dry-run] | rollback
+#   dm appguard get|set|targets|never|packages|kills|once
+#   dm install stage <https-url|/abs/path.zip> [sha256] | install commit <token> --confirm <id>
+#   dm install abort <token> | job <id>
+#   dm create <b64> | import list | import <path> <b64> | delete <id> --plan|--confirm <id>
+#   dm getconf | setconf freeze_unplugged 0|1 | whitelist list|add|rm|set | packages
+#
+# Env (tests): DM_ROOT, KM_MODULE_DIR, KM_ADB, KM_SERVICE_D, KM_AG_DIR, KM_TEST=1.
+
+KM_ARG0=$0
+case $0 in
+  /*) KM_SELF=$0 ;;
+  *) KM_SELF=$(cd "$(dirname "$0")" 2>/dev/null && pwd)/$(basename "$0") ;;
+esac
+KM_BIN=${KM_SELF%/*}
+KM_LIB=$KM_BIN/lib
+
+[ -n "$KM_DEBUG" ] || exec 2>/dev/null
+
+for _lib in km-json km-core km-proc km-migrate km-appguard km-install; do
+  if [ ! -r "$KM_LIB/$_lib.sh" ]; then
+    printf '{"ok":false,"code":"E_UNKNOWN","msg":"dm library missing: %s"}\n' "$_lib"
+    exit 1
+  fi
+  . "$KM_LIB/$_lib.sh"
+done
+
+trap 'lock_drop' EXIT
+km_tools_init
+
+km_usage() {
+  err E_USAGE "usage: dm list|status|start|stop|restart|enable|disable|boot|logs|doctor|version|migrate|rollback|appguard|install|job|create|import|delete|getconf|setconf|whitelist|packages"
+}
+
+km_root_ok() {
+  [ "$(id -u 2>/dev/null)" = 0 ] || [ "$KM_TEST" = 1 ]
+}
+
+km_main() {
+  _cmd=$1
+  [ $# -gt 0 ] && shift
+  case $_cmd in
+    version) cmd_version; return $? ;;
+    '') km_usage; return $? ;;
+  esac
+  if ! km_root_ok; then
+    err E_NOT_ROOT "dm must run as root"
+    return $?
+  fi
+  case $_cmd in
+    doctor) cmd_doctor; return $? ;;
+    migrate) cmd_migrate "$@"; return $? ;;
+  esac
+  ensure_migrated
+  case $_cmd in
+    list) cmd_list ;;
+    status) cmd_status "$1" ;;
+    start) cmd_start "$1" ;;
+    stop) cmd_stop "$1" ;;
+    restart) cmd_restart "$1" ;;
+    boot) cmd_boot "$1" ;;
+    enable) cmd_enable "$1" ;;
+    disable) cmd_disable "$1" "$2" ;;
+    logs) cmd_logs "$1" "$2" ;;
+    rollback) cmd_rollback ;;
+    appguard) cmd_appguard "$@" ;;
+    install) cmd_install "$@" ;;
+    job) cmd_job "$1" ;;
+    create) cmd_create "$1" ;;
+    import) cmd_import "$@" ;;
+    delete) cmd_delete "$@" ;;
+    getconf) cmd_getconf ;;
+    setconf) cmd_setconf "$1" "$2" ;;
+    whitelist) cmd_whitelist "$@" ;;
+    packages) cmd_packages ;;
+    *) err E_USAGE "unknown command: $(printf '%s' "$_cmd" | cut -c1-40 | tr -c 'A-Za-z0-9._-' '?')" ;;
+  esac
+}
+
+km_main "$@"
+_rc=$?
+if [ -z "$OUT" ]; then
+  OUT='{"ok":false,"code":"E_UNKNOWN","msg":"internal error: no result"}'
+  _rc=1
+fi
+case $OUT in
+  '{"ok":true'*) _rc=0 ;;
+  *) _rc=1 ;;
+esac
+printf '%s\n' "$OUT"
+exit $_rc

@@ -1,0 +1,16 @@
+id=root-sshd
+name=Root SSH (port 22)
+desc=Key-only root sshd on port 22 while root is up
+kind=daemon
+source=builtin
+start=@ADB@/service.d/root-sshd.sh
+boot_script=@ADB@/service.d/root-sshd.sh
+pidfile=@ADB@/sshd/root.pid
+argv_match=@ADB@/sshd/sshd_config
+stop_scope=pidfile
+start_timeout=10
+stop_grace=5
+health=port:22
+boot=xbit
+removable=0
+log=@ADB@/sshd/root-ssh.log

@@ -1,0 +1,8 @@
+#!/bin/sh
+# stub: reads $AG_STUB/{focus,resumed,recents}.txt
+case "$1 $2" in
+  "window "*) [ -f "$AG_STUB/focus.txt" ] && cat "$AG_STUB/focus.txt" ;;
+  "activity activities") [ -f "$AG_STUB/resumed.txt" ] && cat "$AG_STUB/resumed.txt" ;;
+  "activity recents") [ -f "$AG_STUB/recents.txt" ] && cat "$AG_STUB/recents.txt" ;;
+esac
+exit 0

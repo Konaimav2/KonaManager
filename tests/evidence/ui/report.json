@@ -1,0 +1,183 @@
+{
+  "ok": true,
+  "results": [
+    {
+      "name": "brand title",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "daemon cards rendered",
+      "ok": true,
+      "detail": 6
+    },
+    {
+      "name": "connection chip ready",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no horizontal overflow (desktop)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "AppGuard counts rendered",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "target switch calls dm",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'targets' 'set' 'com.demo.app00' 'u0=0' 'u999=0' 'cooldown=default'",
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'get'",
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'kills' '50'"
+      ]
+    },
+    {
+      "name": "target switch persisted",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "dry sweep result shown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "install review shows hook",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "install commit completed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "installed daemon card appears",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delete plan shown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "create flow completed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "import flow completed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "logs rendered",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "about version rendered",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "doctor rendered",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "360x640 layout phone overflow=0 off=0 cols=1",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=phone cols=1"
+    },
+    {
+      "name": "390x844 layout phone overflow=0 off=0 cols=1",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=phone cols=1"
+    },
+    {
+      "name": "414x896 layout phone overflow=0 off=0 cols=1",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=phone cols=1"
+    },
+    {
+      "name": "768x1024 layout tablet overflow=0 off=0 cols=2",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=tablet cols=2"
+    },
+    {
+      "name": "820x1180 layout tablet overflow=0 off=0 cols=2",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=tablet cols=2"
+    },
+    {
+      "name": "1024x1366 layout desktop overflow=0 off=0 cols=3",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=desktop cols=3"
+    },
+    {
+      "name": "1280x800 layout desktop overflow=0 off=0 cols=3",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=desktop cols=3"
+    },
+    {
+      "name": "1440x900 layout desktop overflow=0 off=0 cols=3",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=desktop cols=3"
+    },
+    {
+      "name": "1920x1080 layout desktop overflow=0 off=0 cols=3",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=desktop cols=3"
+    },
+    {
+      "name": "1080x1080 layout desktop overflow=0 off=0 cols=3",
+      "ok": true,
+      "detail": "overflow=0 off=0 layout=desktop cols=3"
+    },
+    {
+      "name": "mobile bottom tab bar",
+      "ok": true,
+      "detail": {
+        "pos": "fixed",
+        "bottom": "0px"
+      }
+    },
+    {
+      "name": "desktop tab bar top",
+      "ok": true,
+      "detail": "static"
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "commands": null,
+  "viewports": [
+    "360x640",
+    "390x844",
+    "414x896",
+    "768x1024",
+    "820x1180",
+    "1024x1366",
+    "1280x800",
+    "1440x900",
+    "1920x1080",
+    "1080x1080"
+  ],
+  "screenshots": "/root/temp/konamanager/tests/evidence/ui"
+}

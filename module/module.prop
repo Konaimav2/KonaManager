@@ -1,0 +1,7 @@
+id=daemon-manager
+name=KonaManager - Simple Daemon Manager
+version=v2.0.0
+versionCode=200
+author=Konaimav2
+description=Start, stop, enable and install local root daemons with verified state, plus a configurable AppGuard, from a WebUI.
+updateJson=https://raw.githubusercontent.com/Konaimav2/KonaManager/main/update.json

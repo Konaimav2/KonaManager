@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "$*" >>"$AG_STUB/am.log"
+exit 0
