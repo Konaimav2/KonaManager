@@ -327,7 +327,7 @@
     var body = E('div'); body.appendChild(E('p', 'muted', 'Loading…'));
     sh.setBody(body);
     Promise.all([KM.call(['getconf'], KM.T.read), KM.call(['packages'], KM.T.read)]).then(function (res) {
-      var c = res[0], pkgs = res[1] || [];
+      var r = res[1], c = res[0], pkgs = Array.isArray(r) ? r : (r && r.packages) || [];
       clear(body);
       var swRow = E('div', 'switch-row');
       swRow.appendChild(E('span', 'switch-label', 'Freeze while unplugged'));

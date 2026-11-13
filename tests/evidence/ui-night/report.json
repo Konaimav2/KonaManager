@@ -1,0 +1,1578 @@
+{
+  "ok": true,
+  "generated": "2026-11-13T06:54:09+0700",
+  "passed": 114,
+  "failed": 0,
+  "total": 114,
+  "results": [
+    {
+      "name": "brand title",
+      "ok": true,
+      "detail": "KonaManager - Simple Daemon Manager",
+      "section": "legacy"
+    },
+    {
+      "name": "daemon cards rendered",
+      "ok": true,
+      "detail": 6,
+      "section": "legacy"
+    },
+    {
+      "name": "connection chip ready",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "no horizontal overflow (desktop)",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "install review shows hook",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "install commit completed",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "installed daemon card appears",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "delete plan shown",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "create flow completed",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "import flow completed",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "logs rendered",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "about version rendered",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "doctor rendered",
+      "ok": true,
+      "detail": "",
+      "section": "legacy"
+    },
+    {
+      "name": "C1 exactly 3 [role=tab] Daemons/Logs/About",
+      "ok": true,
+      "detail": [
+        "Daemons",
+        "Logs",
+        "About"
+      ],
+      "section": "C1 structure"
+    },
+    {
+      "name": "C1 no #tab-appguard, #panel-appguard, [id^=ag-] outside #modal-root",
+      "ok": true,
+      "detail": {
+        "tab": false,
+        "panel": false,
+        "ag": []
+      },
+      "section": "C1 structure"
+    },
+    {
+      "name": "C2 sheet role=dialog aria-modal=true title AppGuard",
+      "ok": true,
+      "detail": {
+        "aria": "true",
+        "ag": true,
+        "title": "AppGuard",
+        "dialogs": 1
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 six sections Status/Settings/Run now/Targets/Never/Recent kills",
+      "ok": true,
+      "detail": [
+        "Status",
+        "Settings",
+        "Run now",
+        "Targets",
+        "Never",
+        "Recent kills"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 status shows running state, PID 17741 and uptime",
+      "ok": true,
+      "detail": "Status | RUNNING | PID | 17741 | UPTIME | 1h 0m | 33 targets | 30 u0 | 3 u999 | 6 never | Start | Stop | Restart",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 kills rows == 3",
+      "ok": true,
+      "detail": 3,
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Start disabled, Stop/Restart enabled while running",
+      "ok": true,
+      "detail": [
+        "start:disabled",
+        "stop:enabled",
+        "restart:enabled"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 default cooldown input shows 300, interval 60",
+      "ok": true,
+      "detail": [
+        "300",
+        "60"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 44x44 audit .ag-sheet @390x844 (main view)",
+      "ok": true,
+      "detail": {
+        "n": 0,
+        "total": 156,
+        "bad": []
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 sheet 390x844 overflow=0 edge-crossers=0 full-screen",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": {
+          "n": 0,
+          "list": []
+        },
+        "panel": [
+          0,
+          0,
+          390,
+          844
+        ]
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Restart issues dm restart appguard",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'restart' 'appguard'",
+        "/data/adb/modules/daemon-manager/bin/dm 'list'",
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'get'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Stop issues dm stop appguard and status shows stopped",
+      "ok": true,
+      "detail": [
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'stop' 'appguard'",
+          "/data/adb/modules/daemon-manager/bin/dm 'list'",
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'get'"
+        ],
+        "status\nstopped\npid\n-\nuptime\n-\n33 targets\n30 u0\n3 u999\n6 never\nstart\nstop\nrestart"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Start issues dm start appguard and status shows running",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'start' 'appguard'",
+        "/data/adb/modules/daemon-manager/bin/dm 'list'",
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'get'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 sheet still open after lifecycle actions (single dialog)",
+      "ok": true,
+      "detail": "",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 interval set 90 command + persisted",
+      "ok": true,
+      "detail": {
+        "interval_s": 90,
+        "cooldown_s": 450,
+        "dry_run": true
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 default cooldown set 450 command + persisted",
+      "ok": true,
+      "detail": {
+        "interval_s": 90,
+        "cooldown_s": 450,
+        "dry_run": true
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 dry-run on/off commands + note",
+      "ok": true,
+      "detail": [
+        {
+          "interval_s": 90,
+          "cooldown_s": 450,
+          "dry_run": true
+        },
+        {
+          "interval_s": 90,
+          "cooldown_s": 450,
+          "dry_run": false
+        },
+        true
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Run once shows inline confirm strip (no nested dialog)",
+      "ok": true,
+      "detail": "Run now\nRun once\nDry run once\nSends real am-kill requests.\nConfirm\nCancel\n\nDry run writes the kill history but sends no ",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 44x44 audit with confirm strip open",
+      "ok": true,
+      "detail": {
+        "n": 0,
+        "total": 158,
+        "bad": []
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Cancel sends no once command",
+      "ok": true,
+      "detail": [],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Run once confirm -> appguard once WITHOUT --dry",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'once'",
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'kills' '50'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Dry run once -> once --dry, result box shows candidates",
+      "ok": true,
+      "detail": [
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'once' '--dry'",
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'kills' '50'"
+        ],
+        "dry \u00b7 candidates 2 \u00b7 killed 0 \u00b7 42 ms\nwould kill:\n  u0 com.demo.idle"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 U0 toggle: targets set command, aria-checked flips, same row node",
+      "ok": true,
+      "detail": [
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'targets' 'set' 'com.demo.app00' 'u0=0' 'u999=0' 'cooldown=default'"
+        ],
+        true,
+        [
+          false,
+          false
+        ]
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 U999 toggle: targets set command, aria-checked flips, same row node",
+      "ok": true,
+      "detail": [
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'targets' 'set' 'com.demo.app00' 'u0=0' 'u999=1' 'cooldown=default'"
+        ],
+        true,
+        [
+          false,
+          true
+        ]
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 per-app cooldown 120 -> targets set cooldown=120, persisted",
+      "ok": true,
+      "detail": [
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'targets' 'set' 'com.demo.app01' 'u0=1' 'u999=0' 'cooldown=120'"
+        ],
+        120
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 picker (target) opens in-sheet, single dialog",
+      "ok": true,
+      "detail": "",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 44x44 audit with picker open",
+      "ok": true,
+      "detail": {
+        "n": 0,
+        "total": 41,
+        "bad": []
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 picker Back closes picker, sheet stays, focus returns to opener",
+      "ok": true,
+      "detail": "picker-target",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 picker target mode adds com.demo.extra (u0=1 u999=0) and row appears",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'targets' 'add' 'com.demo.extra' 'u0=1' 'u999=0'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 picker never mode adds com.demo.ghost chip",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'never' 'add' 'com.demo.ghost'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 never chip remove -> never rm, chip gone",
+      "ok": true,
+      "detail": [
+        "/data/adb/modules/daemon-manager/bin/dm 'appguard' 'never' 'rm' 'com.demo.ghost'"
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 focus trap: Tab from last wraps to first, Shift+Tab from first wraps to last",
+      "ok": true,
+      "detail": {
+        "trap": {
+          "n": 159,
+          "first": "Close",
+          "last": "Done"
+        },
+        "fwd": {
+          "inside": true,
+          "isFirst": true
+        },
+        "back": {
+          "inside": true,
+          "isLast": true
+        }
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 focus stays inside dialog after 4 more Tabs",
+      "ok": true,
+      "detail": "",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 Escape in picker goes Back first (sheet stays)",
+      "ok": true,
+      "detail": "",
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 second Escape closes sheet, focus restored to AppGuard gear",
+      "ok": true,
+      "detail": {
+        "act": "settings",
+        "card": "appguard"
+      },
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 sheet flow: zero console/page errors",
+      "ok": true,
+      "detail": [
+        [],
+        []
+      ],
+      "section": "C2 appguard sheet"
+    },
+    {
+      "name": "C2 sheet full-screen at 360x640, overflow=0, edge-crossers=0",
+      "ok": true,
+      "detail": {
+        "panel": [
+          0,
+          0,
+          360,
+          640
+        ],
+        "overflow": 0,
+        "edge": {
+          "n": 0,
+          "list": []
+        }
+      },
+      "section": "C2 sheet 360x640"
+    },
+    {
+      "name": "C2 44x44 audit .ag-sheet @360x640",
+      "ok": true,
+      "detail": {
+        "n": 0,
+        "total": 156,
+        "bad": []
+      },
+      "section": "C2 sheet 360x640"
+    },
+    {
+      "name": "C2 sheet 1280x800 inside viewport, overflow=0, edge-crossers=0",
+      "ok": true,
+      "detail": {
+        "panel": [
+          260,
+          40,
+          760,
+          720,
+          1280,
+          800
+        ],
+        "overflow": 0,
+        "edge": {
+          "n": 0,
+          "list": []
+        }
+      },
+      "section": "C2 sheet 1280x800"
+    },
+    {
+      "name": "C2 44x44 audit .ag-sheet @1280x800",
+      "ok": true,
+      "detail": {
+        "n": 0,
+        "total": 156,
+        "bad": []
+      },
+      "section": "C2 sheet 1280x800"
+    },
+    {
+      "name": "C3 DSC gear opens \"Deep Sleep Cool\" sheet",
+      "ok": true,
+      "detail": "Deep Sleep Cool",
+      "section": "C3 DSC"
+    },
+    {
+      "name": "C3 DSC sheet renders \"Freeze while unplugged\" switch",
+      "ok": true,
+      "detail": "textContent='Freeze while unplugged' sw_ok=True body=FREEZE WHILE UNPLUGGED |  | When off, apps are only frozen while charging with the screen off. |  | Never freeze | com.a | com.b | Add",
+      "section": "C3 DSC"
+    },
+    {
+      "name": "C3 DSC switch toggles via setconf freeze_unplugged",
+      "ok": true,
+      "detail": [
+        "true",
+        "false",
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'setconf' 'freeze_unplugged' '0'",
+          "/data/adb/modules/daemon-manager/bin/dm 'getconf'",
+          "/data/adb/modules/daemon-manager/bin/dm 'packages'"
+        ]
+      ],
+      "section": "C3 DSC"
+    },
+    {
+      "name": "C3b DIAGNOSTIC (bare-array packages, NOT the dm contract): rest of DSC sheet works, switch toggles via setconf",
+      "ok": true,
+      "detail": [
+        "true",
+        "false",
+        [
+          "/data/adb/modules/daemon-manager/bin/dm 'setconf' 'freeze_unplugged' '0'",
+          "/data/adb/modules/daemon-manager/bin/dm 'getconf'",
+          "/data/adb/modules/daemon-manager/bin/dm 'packages'"
+        ]
+      ],
+      "section": "C3b DSC diagnostic"
+    },
+    {
+      "name": "C4 scrolled to 300 (precondition)",
+      "ok": true,
+      "detail": 300,
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C4 KM.pollNow() ran (resolved true) and list issued; plus >=1 real 5.5s tick",
+      "ok": true,
+      "detail": {
+        "pollNow": true,
+        "list_calls_in_window": 2
+      },
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C4 MutationObserver on #daemon-list: 0 records",
+      "ok": true,
+      "detail": {
+        "records": 0,
+        "sample": []
+      },
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C4 same card node references",
+      "ok": true,
+      "detail": "",
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C4 window.scrollY unchanged",
+      "ok": true,
+      "detail": [
+        300,
+        300
+      ],
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C4 activeElement unchanged",
+      "ok": true,
+      "detail": "",
+      "section": "C4 no-change poll"
+    },
+    {
+      "name": "C5 changed poll: same card nodes, 0 .card removals",
+      "ok": true,
+      "detail": {
+        "same": true,
+        "removed": 0,
+        "records": 1,
+        "up0": "1h 0m",
+        "up1": "1h 1m",
+        "sameAg": true
+      },
+      "section": "C5 changed poll"
+    },
+    {
+      "name": "C5 uptime text updated in place (3612s -> 3672s)",
+      "ok": true,
+      "detail": {
+        "same": true,
+        "removed": 0,
+        "records": 1,
+        "up0": "1h 0m",
+        "up1": "1h 1m",
+        "sameAg": true
+      },
+      "section": "C5 changed poll"
+    },
+    {
+      "name": "C6 sheet open: 0 list calls in 6 s, pollNow() resolves false",
+      "ok": true,
+      "detail": {
+        "list_calls": 0,
+        "pollNow": false
+      },
+      "section": "C6 pause: sheet open"
+    },
+    {
+      "name": "C6 Logs tab: 0 list calls in 6 s, pollNow() resolves false",
+      "ok": true,
+      "detail": {
+        "list_calls": 0,
+        "pollNow": false
+      },
+      "section": "C6 pause: logs tab"
+    },
+    {
+      "name": "C6 document.hidden: 0 list calls in 6 s, pollNow() resolves false",
+      "ok": true,
+      "detail": {
+        "list_calls": 0,
+        "pollNow": false
+      },
+      "section": "C6 pause: hidden"
+    },
+    {
+      "name": "C6 visible again: poll resumes with one immediate refresh (1..2 list calls)",
+      "ok": true,
+      "detail": 1,
+      "section": "C6 pause: hidden"
+    },
+    {
+      "name": "C7 100 rapid tab switches: 0 pageerror, 0 console error",
+      "ok": true,
+      "detail": [
+        [],
+        []
+      ],
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 no empty active panel at every 10th switch (10 checks)",
+      "ok": true,
+      "detail": {
+        "checked": 10,
+        "empty": []
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 list calls during burst <= 2",
+      "ok": true,
+      "detail": {
+        "list_calls": 0,
+        "all_cmds": 3
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 no .panel-error after burst, unexpected console.warn = 0",
+      "ok": true,
+      "detail": [
+        0,
+        []
+      ],
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 40 wheel +-1200 on daemon list: no errors, cards intact, page scrolled",
+      "ok": true,
+      "detail": {
+        "state": {
+          "sy": 0,
+          "h": 2679,
+          "cards": 6
+        },
+        "scrollY_samples": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 40 wheel +-1200 on #log-output (200 lines): scrollable, no errors",
+      "ok": true,
+      "detail": {
+        "log": {
+          "lines": 200,
+          "sh": 3862,
+          "ch": 582,
+          "ov": "auto"
+        },
+        "scrollTop_samples": [
+          2080,
+          2080,
+          2080,
+          2080,
+          2080,
+          2080,
+          2080,
+          2080,
+          2080,
+          2080
+        ]
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 AppGuard sheet open/close x10: closes cleanly, modal-root empty, no errors",
+      "ok": true,
+      "detail": {
+        "modal_root_nodes_after_close": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 target toggle + cooldown applied after stress (mock state)",
+      "ok": true,
+      "detail": {
+        "cooldown_s": 240,
+        "u0": false
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 Logs scroll kept across pollNow (skipped) + 5.6 s of timers",
+      "ok": true,
+      "detail": {
+        "before": 400,
+        "after": 400,
+        "pollNow": false
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 after stress: no-change poll keeps daemon scrollY, 0 mutations, same nodes",
+      "ok": true,
+      "detail": {
+        "scrollY": [
+          300,
+          300
+        ],
+        "mutations": 0,
+        "same": true,
+        "pollNow": true,
+        "list_calls": 2
+      },
+      "section": "C7 stress"
+    },
+    {
+      "name": "C7 stress run: zero pageerror / console error",
+      "ok": true,
+      "detail": [
+        [],
+        []
+      ],
+      "section": "C7 stress"
+    },
+    {
+      "name": "C8 auto on, scrolled to top, logGrow on, 6 s: scrollTop unchanged (0)",
+      "ok": true,
+      "detail": {
+        "scrollTop": 0,
+        "precond": {
+          "sh": 3862,
+          "ch": 582,
+          "top": 3280
+        }
+      },
+      "section": "C8 logs"
+    },
+    {
+      "name": "C8 no logs call while away from bottom",
+      "ok": true,
+      "detail": [],
+      "section": "C8 logs"
+    },
+    {
+      "name": "C8 at bottom, 6 s: new line appended and still at bottom (gap<=1)",
+      "ok": true,
+      "detail": {
+        "last_before": "mock log line 200",
+        "last_after": "mock log line 201",
+        "gap": 0,
+        "logs_calls": 1
+      },
+      "section": "C8 logs"
+    },
+    {
+      "name": "C9 poison + Refresh -> .panel-error with Retry in Daemons panel",
+      "ok": true,
+      "detail": {
+        "text": "E_RENDER\nCould not render daemon list: item.pids.join is not a function\nRetry",
+        "retry": true,
+        "role": "alert"
+      },
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C9 boundary logs console.warn only (no console error / pageerror)",
+      "ok": true,
+      "detail": [
+        [],
+        [],
+        [
+          "[C9 error boundary] [KM] render failed: daemon list item.pids.join is not a function"
+        ]
+      ],
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C9 tabs still switch while the Daemons panel is in error",
+      "ok": true,
+      "detail": [
+        [
+          "logs",
+          true
+        ],
+        [
+          "about",
+          true
+        ],
+        [
+          "daemons",
+          true
+        ]
+      ],
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C9 shell intact: header + tabs + conn chip visible",
+      "ok": true,
+      "detail": "",
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C9 clear fault + Retry -> cards back, no .panel-error",
+      "ok": true,
+      "detail": {
+        "cards": 6,
+        "note": "panel-error survived tab switches"
+      },
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C9 error boundary run: 0 pageerror, 0 console error",
+      "ok": true,
+      "detail": [
+        [],
+        []
+      ],
+      "section": "C9 error boundary"
+    },
+    {
+      "name": "C10 360x640: overflow=0 edge=0 layout=phone cols=1 tabbar=fixed",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "phone",
+        "cols": 1,
+        "tabbar": "fixed"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 360x640: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 390x844: overflow=0 edge=0 layout=phone cols=1 tabbar=fixed",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "phone",
+        "cols": 1,
+        "tabbar": "fixed"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 390x844: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 414x896: overflow=0 edge=0 layout=phone cols=1 tabbar=fixed",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "phone",
+        "cols": 1,
+        "tabbar": "fixed"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 414x896: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 768x1024: overflow=0 edge=0 layout=tablet cols=2 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "tablet",
+        "cols": 2,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 768x1024: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 820x1180: overflow=0 edge=0 layout=tablet cols=2 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "tablet",
+        "cols": 2,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 820x1180: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1024x1366: overflow=0 edge=0 layout=desktop cols=3 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "desktop",
+        "cols": 3,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1024x1366: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1280x800: overflow=0 edge=0 layout=desktop cols=3 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "desktop",
+        "cols": 3,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1280x800: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1440x900: overflow=0 edge=0 layout=desktop cols=3 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "desktop",
+        "cols": 3,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1440x900: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1920x1080: overflow=0 edge=0 layout=desktop cols=3 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "desktop",
+        "cols": 3,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1920x1080: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1080x1080: overflow=0 edge=0 layout=desktop cols=3 tabbar=static",
+      "ok": true,
+      "detail": {
+        "overflow": 0,
+        "edge": 0,
+        "layout": "desktop",
+        "cols": 3,
+        "tabbar": "static"
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C10 1080x1080: Logs/About/Daemons panels no overflow / edge-crossers",
+      "ok": true,
+      "detail": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "section": "C10 viewports"
+    },
+    {
+      "name": "C12 backend: >= 596 passed and failure-name set == baseline",
+      "ok": true,
+      "detail": "TOTAL: 596 passed, 42 failed; failed names 42; new=[]; fixed=[]; gate>=596",
+      "section": "C12 backend"
+    },
+    {
+      "name": "C12 node --check all module/webroot/js/*.js (5 files)",
+      "ok": true,
+      "detail": [
+        [
+          "add.js",
+          0,
+          ""
+        ],
+        [
+          "appguard.js",
+          0,
+          ""
+        ],
+        [
+          "core.js",
+          0,
+          ""
+        ],
+        [
+          "daemons.js",
+          0,
+          ""
+        ],
+        [
+          "misc.js",
+          0,
+          ""
+        ]
+      ],
+      "section": "C12 backend"
+    },
+    {
+      "name": "C11 zero console error across the whole run",
+      "ok": true,
+      "detail": [],
+      "section": "global"
+    },
+    {
+      "name": "C11 zero pageerror across the whole run",
+      "ok": true,
+      "detail": [],
+      "section": "global"
+    },
+    {
+      "name": "C11 console.warn only from the injected boundary fault (C9)",
+      "ok": true,
+      "detail": [],
+      "section": "global"
+    }
+  ],
+  "console_errors": [],
+  "page_errors": [],
+  "console_warnings": [
+    "[C9 error boundary] [KM] render failed: daemon list item.pids.join is not a function"
+  ],
+  "viewports": [
+    {
+      "name": "ag-sheet-390x844",
+      "overflow": 0,
+      "edge": 0,
+      "panel": [
+        0,
+        0,
+        390,
+        844
+      ]
+    },
+    {
+      "name": "ag-sheet-360x640",
+      "overflow": 0,
+      "edge": 0,
+      "panel": [
+        0,
+        0,
+        360,
+        640
+      ]
+    },
+    {
+      "name": "ag-sheet-1280x800",
+      "overflow": 0,
+      "edge": 0,
+      "panel": [
+        260,
+        40,
+        760,
+        720,
+        1280,
+        800
+      ]
+    },
+    {
+      "viewport": "360x640",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "phone",
+      "expected": "phone",
+      "cols": 1,
+      "exp_cols": 1,
+      "tabbar": "fixed",
+      "shot": "360x640.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "390x844",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "phone",
+      "expected": "phone",
+      "cols": 1,
+      "exp_cols": 1,
+      "tabbar": "fixed",
+      "shot": "390x844.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "414x896",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "phone",
+      "expected": "phone",
+      "cols": 1,
+      "exp_cols": 1,
+      "tabbar": "fixed",
+      "shot": "414x896.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "768x1024",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "tablet",
+      "expected": "tablet",
+      "cols": 2,
+      "exp_cols": 2,
+      "tabbar": "static",
+      "shot": "768x1024.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "820x1180",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "tablet",
+      "expected": "tablet",
+      "cols": 2,
+      "exp_cols": 2,
+      "tabbar": "static",
+      "shot": "820x1180.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "1024x1366",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "desktop",
+      "expected": "desktop",
+      "cols": 3,
+      "exp_cols": 3,
+      "tabbar": "static",
+      "shot": "1024x1366.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "1280x800",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "desktop",
+      "expected": "desktop",
+      "cols": 3,
+      "exp_cols": 3,
+      "tabbar": "static",
+      "shot": "1280x800.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "1440x900",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "desktop",
+      "expected": "desktop",
+      "cols": 3,
+      "exp_cols": 3,
+      "tabbar": "static",
+      "shot": "1440x900.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "1920x1080",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "desktop",
+      "expected": "desktop",
+      "cols": 3,
+      "exp_cols": 3,
+      "tabbar": "static",
+      "shot": "1920x1080.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    },
+    {
+      "viewport": "1080x1080",
+      "overflow": 0,
+      "edge": 0,
+      "layout": "desktop",
+      "expected": "desktop",
+      "cols": 3,
+      "exp_cols": 3,
+      "tabbar": "static",
+      "shot": "1080x1080.png",
+      "tabs_overflow": {
+        "logs": [
+          0,
+          0
+        ],
+        "about": [
+          0,
+          0
+        ],
+        "daemons": [
+          0,
+          0
+        ]
+      },
+      "ok": true
+    }
+  ],
+  "extra_info": {
+    "log_scrollTop_after_tab_roundtrip": {
+      "set": 400,
+      "after": 400
+    },
+    "boundary_warnings": [
+      "[C9 error boundary] [KM] render failed: daemon list item.pids.join is not a function"
+    ]
+  },
+  "backend": {
+    "total": "TOTAL: 596 passed, 42 failed",
+    "passed": 596,
+    "failed": 42,
+    "new_failures": [],
+    "fixed_since_baseline": [],
+    "ok": true,
+    "detail": "TOTAL: 596 passed, 42 failed; failed names 42; new=[]; fixed=[]; gate>=596"
+  },
+  "screenshots": "tests/evidence/ui-night"
+}

@@ -2,6 +2,14 @@
 (() => {
   const st = __STATE__;
   window.__cmds = [];
+  window.__mockState = st;
+  st.faults = st.faults || {};
+  st.delays = st.delays || {};
+  st.failOn = st.failOn || {};
+  window.__cmdT = [];
+  st.logGrow = !!st.logGrow;
+  st.logN = st.logN || 0;
+  st.conf = st.conf || { freeze_unplugged: true, whitelist: ['com.a', 'com.b'] };
 
   function counts() {
     let u0 = 0, u999 = 0;
@@ -45,7 +53,29 @@
   function handle(cmd) {
     const a = tokenize(cmd); a.shift();
     const c = a[0];
-    if (c === 'list') return ok({ ok: true, dm: '2.0.0', schema: 2, ts: Math.floor(Date.now() / 1000), daemons: st.daemons.map(sync) });
+    if (c === 'list') {
+      const ds = st.daemons.map(sync);
+      /* fault switch: a daemon whose pids.join is not a function makes card() throw */
+      if (st.faults.list === 'poison') ds.push({ id: 'zz-bad', name: 'Bad', pids: { length: 1 }, running: true });
+      return ok({ ok: true, dm: '2.0.0', schema: 2, ts: Math.floor(Date.now() / 1000), daemons: ds });
+    }
+    if (c === 'getconf') return ok({ ok: true, freeze_unplugged: !!st.conf.freeze_unplugged, whitelist: st.conf.whitelist.slice() });
+    if (c === 'setconf') {
+      if (a[1] !== 'freeze_unplugged') return fail('E_ARG', 'unknown setting');
+      st.conf.freeze_unplugged = a[2] === '1';
+      return ok({ ok: true, msg: 'saved' });
+    }
+    if (c === 'whitelist') {
+      if (a[1] === 'add') { if (st.conf.whitelist.indexOf(a[2]) < 0) st.conf.whitelist.push(a[2]); return ok({ ok: true, msg: 'added' }); }
+      if (a[1] === 'rm') { st.conf.whitelist = st.conf.whitelist.filter(x => x !== a[2]); return ok({ ok: true, msg: 'removed' }); }
+      return ok({ ok: true, freeze_unplugged: !!st.conf.freeze_unplugged, whitelist: st.conf.whitelist.slice() });
+    }
+    if (c === 'packages') {
+      const pk = (st.packages['0'] || []).slice();
+      /* faults.packages='array' = DIAGNOSTIC non-contract shape (bare array); default is the real dm shape {ok,packages} (tests/run.sh:333-335) */
+      if (st.faults.packages === 'array') return { errno: 0, stdout: JSON.stringify(pk), stderr: '' };
+      return ok({ ok: true, packages: pk });
+    }
     if (c === 'version') return ok({ ok: true, version: '2.0.0', schema: 2 });
     if (c === 'doctor') return ok({ ok: true, root: true, tools: { curl: null, unzip: '/data/adb/ksu/bin/busybox unzip', sha256sum: '/data/adb/ksu/bin/busybox sha256sum', base64: '/data/adb/ksu/bin/busybox base64', pm: '/system/bin/pm' }, selinux: 'Enforcing', writable: true, busybox: '/data/adb/ksu/bin/busybox' });
     if (c === 'status') {
@@ -66,7 +96,14 @@
       sync(d);
       return ok({ ok: true, id: d.id, enabled: d.enabled, boot: d.boot, stopped: c === 'disable' && !d.running, msg: c + ' ok' });
     }
-    if (c === 'logs') return ok({ ok: true, source: a[1], lines: ['mock log line', 'second line', 'third line'], truncated: false });
+    if (c === 'logs') {
+      /* n numbered lines; with st.logGrow every call appends one more line (tail window slides) */
+      const n = Math.max(1, parseInt(a[2], 10) || 100);
+      if (st.logGrow) st.logN++;
+      const lines = [];
+      for (let i = 1; i <= n; i++) lines.push('mock log line ' + (st.logN + i));
+      return ok({ ok: true, source: a[1], lines: lines, truncated: false });
+    }
     if (c === 'appguard') {
       const sub = a[1];
       if (sub === 'get') return ok(appguard());
@@ -86,7 +123,9 @@
         }
         if (op === 'add') {
           let t = target(p);
-          if (!t) { t = { pkg: p, u0: false, u999: false, cooldown_s: null }; st.targets.push(t); }
+          /* backend parity (km-appguard.sh:191): add on an existing target is a conflict */
+          if (t) return fail('E_CONFLICT', 'already a target');
+          t = { pkg: p, u0: false, u999: false, cooldown_s: null }; st.targets.push(t);
           a.slice(4).forEach(kv => { const i = kv.indexOf('='); const k = kv.slice(0, i), v = kv.slice(i + 1); if (k === 'u0') t.u0 = v === '1'; else if (k === 'u999') t.u999 = v === '1'; else if (k === 'cooldown') t.cooldown_s = v === 'default' ? null : Number(v); });
           return ok({ ok: true, pkg: t.pkg, u0: t.u0, u999: t.u999, cooldown_s: t.cooldown_s });
         }
@@ -150,15 +189,20 @@
 
   window.ksu = {
     exec: function (cmd, cb) {
-      window.__cmds.push(cmd);
+      window.__cmds.push(cmd); window.__cmdT.push(performance.now());
+      /* hooks: st.delays {substr: ms} slows matching cmds, st.failOn {substr: code} fails them */
+      let ms = 15; for (const k in st.delays) if (cmd.indexOf(k) >= 0) ms = Math.max(ms, st.delays[k]);
+      let code = null; for (const k in st.failOn) if (cmd.indexOf(k) >= 0) code = st.failOn[k];
+      function run() {
+        try { return code ? fail(code, 'mock fault ' + code) : handle(cmd); }
+        catch (e) { return { errno: 1, stdout: '', stderr: String(e) }; }
+      }
+      /* delayed cmds are answered from state AT REQUEST TIME (a real backend reads state when it runs) */
+      const pre = ms > 15 ? run() : null;
       setTimeout(function () {
-        try {
-          const r = handle(cmd);
-          window[cb](r.errno, r.stdout, r.stderr);
-        } catch (e) {
-          window[cb](1, '', String(e));
-        }
-      }, 15);
+        const r = pre || run();
+        window[cb](r.errno, r.stdout, r.stderr);
+      }, ms);
     }
   };
 })();

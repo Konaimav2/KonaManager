@@ -35,12 +35,13 @@
     tab: 'daemons',
     daemons: [], loaded: false, loading: false, error: null,
     busy: {}, details: {}, openDetails: {},
-    ag: null, agKills: null, agError: null, agBusy: false, agResult: null,
+    ag: null, agKills: null, agResult: null,
     agSearch: '', agPage: 50,
-    logs: { source: 'dm', lines: 100, auto: false, loading: false },
-    about: { version: null, doctor: null },
+    logs: { source: 'dm', lines: 100, auto: false, loading: false, text: null, pending: null, sig: null },
+    about: { version: null, doctor: null, dirty: false },
     modal: null, modalBlocking: false,
-    daemonTimer: null, logTimer: null
+    daemonTimer: null, logTimer: null,
+    lastOk: {}, dirty: false, fp: null, detailsRev: 0
   };
 
   function $(id) { return document.getElementById(id); }
@@ -128,8 +129,43 @@
   function setConn(state, label) {
     var c = $('conn-chip');
     if (!c) return;
-    c.dataset.state = state;
-    text(c, label);
+    if (c.dataset.state !== state) c.dataset.state = state;
+    if (c.textContent !== String(label)) text(c, label);
+  }
+
+  /* ---- error boundary ----
+     guard(host, name, fn, retry): runs fn; on a throw (or a rejected promise
+     returned by fn) logs with console.warn and replaces only host's content
+     with an inline .panel-error carrying a Retry button. */
+  function panelError(host, name, e, retry) {
+    if (!host) return;
+    clear(host);
+    var box = E('div', 'panel-error');
+    box.setAttribute('role', 'alert');
+    box.appendChild(E('span', 'code', 'E_RENDER'));
+    box.appendChild(E('span', 'msg', 'Could not render ' + name + ': ' + ((e && (e.message || e.msg)) || String(e)).slice(0, 160)));
+    if (typeof retry === 'function') {
+      var b = btn('Retry', 'small', 'refresh');
+      b.dataset.retry = name;
+      b.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        try { retry(); } catch (x) { console.warn('[KM] retry failed: ' + name, x); }
+      });
+      box.appendChild(b);
+    }
+    host.appendChild(box);
+  }
+  function guard(host, name, fn, retry) {
+    var fail = function (e) {
+      try { console.warn('[KM] render failed: ' + name, e && e.message ? e.message : e); } catch (x) {}
+      try { panelError(host, name, e, retry); } catch (x) {}
+      return undefined;
+    };
+    try {
+      var r = fn();
+      if (r && typeof r.then === 'function') return r.then(null, fail);
+      return r;
+    } catch (e) { return fail(e); }
   }
 
   KM.$ = $; KM.E = E; KM.clear = clear; KM.text = text; KM.icon = icon;
@@ -137,6 +173,7 @@
   KM.fmtUptime = fmtUptime; KM.fmtBytes = fmtBytes; KM.fmtTs = fmtTs; KM.relTime = relTime;
   KM.errInfo = errInfo; KM.showError = showError; KM.hideError = hideError;
   KM.toast = toast; KM.setConn = setConn;
+  KM.guard = guard; KM.panelError = panelError;
 
   /* ---- KernelSU bridge ---- */
   var queue = [], active = 0, seq = 0;
@@ -208,9 +245,18 @@
   };
 
   /* ---- tabs ---- */
-  KM.tabs = ['daemons', 'appguard', 'logs', 'about'];
-  KM.activate = function (tab, push) {
-    if (KM.tabs.indexOf(tab) < 0) tab = 'daemons';
+  KM.tabs = ['daemons', 'logs', 'about'];
+  KM.STALE_MS = 5000;
+  /* true when the panel has never loaded OK or its last OK load is >= 5 s old */
+  KM.stale = function (tab) {
+    var t = KM.S.lastOk[tab];
+    return !t || Date.now() - t >= KM.STALE_MS;
+  };
+  KM.markOk = function (tab) { KM.S.lastOk[tab] = Date.now(); };
+  KM.activate = function (tab, push, force) {
+    /* unknown or legacy (#appguard) hashes fall back to daemons, no auto-open */
+    if (KM.tabs.indexOf(tab) < 0) { tab = 'daemons'; push = true; }
+    var prev = KM.S.tab;
     KM.S.tab = tab;
     KM.tabs.forEach(function (t) {
       var b = $('tab-' + t), p = $('panel-' + t);
@@ -221,10 +267,20 @@
     if (push !== false && location.hash !== '#' + tab) {
       try { history.replaceState(null, '', '#' + tab); } catch (e) { location.hash = tab; }
     }
-    if (tab === 'daemons' && KM.daemons) KM.daemons.load(true);
-    if (tab === 'appguard' && KM.appguard) KM.appguard.load();
-    if (tab === 'logs' && KM.logs) KM.logs.load();
-    if (tab === 'about' && KM.about) KM.about.load();
+    var stale = force || KM.stale(tab);
+    if (tab === 'daemons' && KM.daemons) {
+      if (KM.S.dirty) KM.daemons.render(true);
+      if (stale) KM.daemons.load(true, true);
+    }
+    if (tab === 'logs' && KM.logs) {
+      KM.logs.activate();
+      if (stale) KM.logs.load();
+    }
+    if (tab === 'about' && KM.about) {
+      KM.about.activate();
+      if (stale) KM.about.load();
+    }
+    return prev;
   };
 
   KM.tabKey = function (ev) {
@@ -241,6 +297,8 @@
   function closeSheet(force) {
     if (KM.S.modalBlocking && !force) return;
     var root = $('modal-root');
+    /* M3: anything fired by the teardown (blur/change of a removed field) must not commit */
+    if (KM.S.modal) KM.S.modal.closing = true;
     if (root) clear(root);
     if (KM.S.modal) {
       document.removeEventListener('keydown', KM.S.modal.onKey, true);
@@ -262,9 +320,10 @@
     clear(root);
     var wrap = E('div', 'modal');
     var back = E('div', 'modal-backdrop');
-    var panel = E('div', 'modal-panel');
+    var panel = E('div', 'modal-panel' + (opts.cls ? ' ' + opts.cls : ''));
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
+    panel.tabIndex = -1; /* focus fallback while a section re-renders with every control disabled */
     var title = E('h2', '', opts.title || '');
     title.id = 'km-modal-title';
     panel.setAttribute('aria-labelledby', 'km-modal-title');
@@ -294,20 +353,27 @@
         var b = document.querySelector('#modal-root .modal-backdrop'); if (b) b.style.pointerEvents = v ? 'none' : '';
       },
       onClose: opts.onClose || null,
+      onEscape: opts.onEscape || null,
       onKey: function (ev) {
-        if (ev.key === 'Escape') { ev.preventDefault(); closeSheet(false); return; }
+        if (ev.key === 'Escape') {
+          ev.preventDefault();
+          /* optional hook: return true to consume Escape (e.g. in-sheet Back) */
+          if (api.onEscape) { var used = false; try { used = api.onEscape() === true; } catch (e) {} if (used) return; }
+          closeSheet(false); return;
+        }
         if (ev.key !== 'Tab') return;
         var f = panel.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]');
         if (!f.length) return;
         var first = f[0], lastEl = f[f.length - 1];
-        if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); lastEl.focus(); }
-        else if (!ev.shiftKey && document.activeElement === lastEl) { ev.preventDefault(); first.focus(); }
+        var a = document.activeElement, out = a === panel || !panel.contains(a);
+        if (ev.shiftKey && (a === first || out)) { ev.preventDefault(); lastEl.focus(); }
+        else if (!ev.shiftKey && (a === lastEl || out)) { ev.preventDefault(); first.focus(); }
       }
     };
     back.addEventListener('click', function () { closeSheet(false); });
     document.addEventListener('keydown', api.onKey, true);
     KM.S.modal = api;
-    setTimeout(function () { (body.querySelector('button,input,select,textarea') || x).focus(); }, 20);
+    setTimeout(function () { (body.querySelector('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])') || x).focus(); }, 20);
     return api;
   };
 
@@ -360,10 +426,9 @@
   KM.wireHeader = function () {
     var refresh = $('refresh');
     if (refresh) refresh.addEventListener('click', function () {
-      if (KM.S.tab === 'daemons') KM.daemons.load(true);
-      else if (KM.S.tab === 'appguard') KM.appguard.load();
+      if (KM.S.tab === 'daemons') { KM.S.fp = null; KM.daemons.load(true); }
       else if (KM.S.tab === 'logs') KM.logs.load();
-      else if (KM.S.tab === 'about') KM.about.load();
+      else if (KM.S.tab === 'about') KM.about.load(true);
       refresh.disabled = true;
       setTimeout(function () { refresh.disabled = false; }, 700);
     });
@@ -377,7 +442,8 @@
     }
     window.addEventListener('hashchange', function () {
       var t = (location.hash || '').replace('#', '');
-      if (KM.tabs.indexOf(t) >= 0) KM.activate(t, false);
+      if (t === KM.S.tab) return;
+      KM.activate(t, KM.tabs.indexOf(t) < 0);
     });
   };
 })();

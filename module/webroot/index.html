@@ -45,10 +45,6 @@
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="4.5" width="17" height="6" rx="2"></rect><rect x="3.5" y="13.5" width="17" height="6" rx="2"></rect><path d="M7 7.5h.01M7 16.5h.01"></path></svg>
       <span>Daemons</span>
     </button>
-    <button class="tab" id="tab-appguard" role="tab" aria-selected="false" aria-controls="panel-appguard" data-tab="appguard" tabindex="-1" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 19 6v5.2c0 4.4-2.9 7.6-7 9.3-4.1-1.7-7-4.9-7-9.3V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
-      <span>AppGuard</span>
-    </button>
     <button class="tab" id="tab-logs" role="tab" aria-selected="false" aria-controls="panel-logs" data-tab="logs" tabindex="-1" type="button">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="4.5" width="17" height="15" rx="2"></rect><path d="m7 10 2.5 2L7 14M12.5 15H17"></path></svg>
       <span>Logs</span>
@@ -76,32 +72,6 @@
       </div>
       <div id="daemon-error" class="alert" role="alert" hidden></div>
       <div id="daemon-list" class="cards" aria-busy="true"></div>
-    </section>
-
-    <section class="panel" id="panel-appguard" role="tabpanel" aria-labelledby="tab-appguard" hidden>
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Idle app watchdog</p>
-          <h2>AppGuard</h2>
-        </div>
-        <div class="section-actions">
-          <span id="ag-count" class="count">-</span>
-        </div>
-      </div>
-      <div id="ag-error" class="alert" role="alert" hidden></div>
-      <div id="ag-status" class="ag-status"></div>
-      <div class="ag-grid">
-        <div class="ag-column">
-          <section class="panel-block" id="ag-controls"></section>
-          <section class="panel-block" id="ag-actions"></section>
-          <section class="panel-block" id="ag-result"></section>
-          <section class="panel-block" id="ag-never"></section>
-        </div>
-        <div class="ag-column">
-          <section class="panel-block" id="ag-targets"></section>
-          <section class="panel-block" id="ag-kills"></section>
-        </div>
-      </div>
     </section>
 
     <section class="panel" id="panel-logs" role="tabpanel" aria-labelledby="tab-logs" hidden>

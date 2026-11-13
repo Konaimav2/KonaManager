@@ -14,7 +14,7 @@ Implements `docs/PRD.md` on the `dm` contract in `PLAN.md` section 4. Every `dm`
 :root {
   /* color: surfaces */
   --km-bg:#080b0f; --km-bg-grid:#0d1218; --km-panel:#0f151c; --km-panel-2:#141c25; --km-panel-3:#1b2530;
-  --km-line:#1f2a36; --km-line-strong:#2c3a49; --km-scrim:rgba(4,7,10,.72);
+  --km-line:#1f2a36; --km-line-strong:#2c3a49; --km-scrim:rgba(4,7,10,.78);
   /* color: text (on --km-panel: 15.8 / 8.1 / 5.4 : 1) */
   --km-text:#e6edf3; --km-text-2:#9fadbb; --km-text-3:#8493a2;
   /* color: signal */
@@ -51,15 +51,15 @@ Sizes: body `--km-fs-md`, card title `--km-fs-lg` bold, telemetry `--km-fs-sm` m
 ## 3. App shell
 ```
 header  [mark] KonaManager  Simple Daemon Manager        [conn chip] [refresh]
-tabs    Daemons | AppGuard | Logs | About        (tablist)
+tabs    Daemons | Logs | About        (tablist)
 main    <section role=tabpanel> one visible at a time
 toast   bottom-center live region (polite), errors use role=alert inline instead
 ```
 - **Header:** sticky, `--km-header-h`, blur-free solid `--km-panel`, bottom hairline. Right side: connection chip (`ksu ok` / `no ksu` / `dm error`) and a refresh icon button (44 px) that re-runs the active tab's primary read.
-- **Tab bar:** four tabs with icons (inline SVG) + labels. **Phone (<600 px): fixed bottom bar**, `--km-bar-h` + `env(safe-area-inset-bottom)`, equal-width, thumb reachable; active tab = accent label + top 2 px rail. **Tablet/desktop (>=600 px): under the header**, left-aligned, underline style. [D1: bottom bar on phone is the simplest one-handed layout and removes a second sticky layer.]
+- **Tab bar:** three tabs with icons (inline SVG) + labels. **Phone (<600 px): fixed bottom bar**, `--km-bar-h` + `env(safe-area-inset-bottom)`, equal-width, thumb reachable; active tab = accent label + top 2 px rail. **Tablet/desktop (>=600 px): under the header**, left-aligned, underline style. [D1: bottom bar on phone is the simplest one-handed layout and removes a second sticky layer.]
 - **Content width:** fluid with `padding-inline: var(--km-pad-x)`, `max-width: var(--km-content-max)` (1120), centered; above 1120 the ink grid shows in the gutters. Main gets `padding-bottom: calc(var(--km-bar-h) + 16px)` on phone so the bar never covers the last row.
-- **Daemons toolbar:** title "Daemons", count chip (`n running / n total`), primary button **Add** (opens the Add modal, section 6). Polling: `list` every 5 s while the Daemons tab is visible and `document.visibilityState==='visible'`; paused otherwise; every action also triggers one `list`. [D2]
-- Tab state in `location.hash` (`#daemons|#appguard|#logs|#about`) so reloads keep the tab. Last tab restored from hash only (no localStorage required).
+- **Daemons toolbar:** title "Daemons", count chip (`n running / n total`), primary button **Add** (opens the Add modal, section 6). Polling: `list` every 5 s while the Daemons tab is visible and `document.visibilityState==='visible'`; paused otherwise and while any modal or sheet is open; every action also triggers one `list`. Render and poll rules: section 13. [D2]
+- Tab state in `location.hash` (`#daemons|#logs|#about`) so reloads keep the tab. Last tab restored from hash only (no localStorage required). A legacy `#appguard` hash falls back to `#daemons` and does not auto-open the sheet. [D10]
 
 ## 4. Daemons tab: health card
 Source: one `list` call renders all cards; `status <id>` is called when the card's details drawer opens.
@@ -74,7 +74,7 @@ Source: one `list` call renders all cards; `status <id>` is called when the card
 7. **Failure strip** (only when the last action failed): `last.ok==false` shows `last.code` + message + timestamp (`last.ts`), role=alert, dismissible.
 8. **Details drawer** (inline expand): `status` -> `meta` key/values (mono), `exit_code`, last 10 of `log_tail`, `boot`, `version`, `last` action.
 
-**Settings button** [D3]: only `deep-sleep-cool` exposes Settings (kept compat commands `getconf`, `setconf`, `whitelist`, `packages`); `appguard` Settings switches to the AppGuard tab; other cards hide it. Deep Sleep Cool sheet: toggle "Freeze while unplugged" (`setconf freeze_unplugged 0|1`, revert on failure) and the "Never freeze" whitelist editor with a searchable add list, same behavior as `docs/specs/SPEC-webui-settings.md`.
+**Settings button** [D3]: only `deep-sleep-cool` exposes Settings (kept compat commands `getconf`, `setconf`, `whitelist`, `packages`); `appguard` Settings (gear, label "AppGuard settings") opens the AppGuard settings sheet (section 5); other cards hide it. Deep Sleep Cool sheet: toggle "Freeze while unplugged" (`setconf freeze_unplugged 0|1`, revert on failure) and the "Never freeze" whitelist editor with a searchable add list, same behavior as `docs/specs/SPEC-webui-settings.md`.
 
 **Card states:**
 | State | Rail / dot | Content |
@@ -90,22 +90,28 @@ Source: one `list` call renders all cards; `status <id>` is called when the card
 
 **Action rules.** Start/Stop/Restart set the card busy, call `start|stop|restart <id>` (blocking, 30 s timeout), then re-run `list`. Switch on -> `enable <id>`. Switch off on a **running** daemon opens a small confirm sheet: "Disable and stop now" (`disable <id>`) or "Disable, keep running" (`disable <id> --keep-running`) [D4]. `E_STOP_STILL_RUNNING` on disable: switch shows the new (disabled) state with a failure strip listing `pids` (dm leaves enabled changed). Stopping `root-sshd` asks a one-line confirm ("Ends the port 22 listener. Live sessions stay up.") [D5]. Optimistic UI is not used; the card shows busy until dm answers.
 
-## 5. AppGuard tab
-Reads `appguard get` once on entry and after each write (counts, config, targets, never, `daemon`, versions). Debounce: switches apply immediately; number fields apply on Enter/blur.
+## 5. AppGuard settings sheet
+There is no AppGuard tab [D10]. The `appguard` card's gear opens one `KM.sheet` (title "AppGuard", sub "Idle app watchdog", extra class `ag-sheet`) [D11]. Same pattern as the Deep Sleep Cool sheet: body shows "Loading...", then `appguard get` + `appguard kills 50`, then the sections render into the sheet body. Nothing AppGuard-related renders or polls before the gear is pressed; on close all node refs, timers and listeners are dropped and filter/paging reset. Debounce: switches apply immediately; number fields apply on Enter/blur/Save.
 
-**Layout: phone single column; desktop (>=1000 px) two panes: left 340 px "Control", right fluid "Targets".**
-1. **Status block:** `daemon.state` dot, `pid`, `uptime_s`, Start/Stop/Restart (same commands as the Daemons card), `counts` chips (`33 targets`, `30 u0`, `3 u999`, `6 never`). **Version hint:** if `running_version != installed_version`, an amber strip "Running v{running_version}, installed v{installed_version}. Restart AppGuard to apply." with a Restart button (`restart appguard`). Note under global settings: "Settings apply on the next sweep. No restart needed."
-2. **Global:** `Interval` stepper/number (`config.interval_s`, 10-3600) -> `appguard set interval <v>`; `Default cooldown` (`config.cooldown_s`, 0-86400) -> `appguard set cooldown <v>`; `Dry run` switch (`config.dry_run`) -> `appguard set dry <0|1>`. Out-of-range input shows inline error before sending; `E_ARG` shown inline if dm still rejects it.
-3. **Actions:** `Run once` (`appguard once`, confirm sheet "Kills matching apps now") and `Dry run once` (`appguard once --dry`, no confirm). Both blocking, 60 s timeout, busy state on both buttons. **Result card** from `sweep`: `candidates`, `killed`, `would_kill` list (`user`, `pkg`), `skipped_fg` list, `skipped_cooldown`, `ms`; if `sweep.skipped=="foreground-unknown"` show "Sweep skipped: foreground app unknown (fail-safe)".
-4. **Targets list:** search box (client filter over `targets`), `Add app` button (opens picker: user tabs 0 / 999 -> `appguard packages --user N [--q substr]`, rows show `pkg`, chips `target` and `never`; tap -> `appguard targets add <pkg> u0=1 u999=0` for user 0 or `u0=0 u999=1` for 999). Each row (the **user matrix**):
+**Layout:** one column inside the sheet, `width:min(760px,100%)` from 600 px; full-screen under 600 px (existing sheet rules). Each section is a `<section>` with its own render function and error boundary (section 13); a write re-renders only its own section, and the sheet body keeps its `scrollTop`.
+1. **Status:** `daemon.state` dot, `pid`, `uptime_s`, `counts` chips (`33 targets`, `30 u0`, `3 u999`, `6 never`), Start/Stop/Restart (same commands and busy state as the Daemons card), then re-`get` and patch Status only. **Version hint:** if `running_version != installed_version`, an amber strip "Running v{running_version}, installed v{installed_version}. Restart AppGuard to apply." with a Restart button (`restart appguard`).
+2. **Settings:** `Interval` (`config.interval_s`, 10-3600) -> `appguard set interval <v>`; `Default cooldown` (`config.cooldown_s`, 0-86400) -> `appguard set cooldown <v>`; `Dry run` switch (`config.dry_run`) -> `appguard set dry <0|1>`. Clamped client-side, out-of-range input shows an inline error before sending; `E_ARG` shown inline if dm still rejects it. Note: "Settings apply on the next sweep. No restart needed."
+3. **Run now:** `Run once` (`appguard once`) and `Dry run once` (`appguard once --dry`, no confirm). Run once uses an **inline confirm strip** inside the section ("Sends real am-kill requests." Confirm / Cancel), never a nested sheet. Both buttons busy while running (`KM.T.once` timeout). **Result box** from `sweep`: `candidates`, `killed`, `would_kill` list (`user`, `pkg`), `skipped_fg` list, `skipped_cooldown`, `ms`; if `sweep.skipped=="foreground-unknown"` show "Sweep skipped: foreground app unknown (fail-safe)". When `config.dry_run` is on, show "Dry-run is on: Run once will not kill".
+4. **Targets:** filter input (client filter over `targets`, debounced 150 ms), `Add app` (opens the package picker, target mode). Each row (the **user matrix**):
    - `pkg` (mono, wraps with `overflow-wrap:anywhere`)
-   - **User 0** switch (`u0`) and **User 999** switch (`u999`) -> `appguard targets set <pkg> u0=<0|1> u999=<0|1>`; both off is allowed (dormant row, chip "inactive")
+   - **User 0** switch (`u0`) and **User 999** switch (`u999`) -> `appguard targets set <pkg> u0=<0|1> u999=<0|1>`; both off is allowed (dormant row, chip "inactive"). On success only that row is patched from the response (`pkg,u0,u999,cooldown_s`) and counts are recomputed locally; on failure the switch reverts and the row shows the inline error.
    - **Cooldown** number, blank placeholder "default {cooldown_s}s" (`cooldown_s` null = default) -> `... set <pkg> cooldown=<N|default>`
    - **Blocked by Never** chip when `shadowed:true` (explains: "Never list overrides this target"), with a "Remove from Never" button (`appguard never rm <pkg>`)
-   - Remove (`appguard targets rm <pkg>`) with an undo-free confirm sheet.
-   Phone: each row is a stacked card (pkg on top, two switches side by side, cooldown full width). Tablet+: a 5-column grid row `pkg | U0 | U999 | cooldown | remove` with a sticky header line (CSS grid, not `<table>`, so it never overflows). Rendering is virtualized by paging: first 50 rows, "Show more" +50 [D6].
-5. **Never list:** chips with remove (x) -> `appguard never rm <pkg>`; add field + picker -> `appguard never add <pkg>`; package regex checked client-side (`^[A-Za-z0-9_.]+$`, <=128) before send. One global list (no per-user).
-6. **Recent kills:** `appguard kills 50` -> rows `ts` (relative + absolute), `user`, `pkg`, `mode` chip (`kill`/`dry`), `result` chip (`ok` green / `fail` red), `cooldown_s`, `reason`. Header shows `total`. Empty: "No kills recorded yet." Refresh button; auto-refresh after Run once.
+   - Remove (`appguard targets rm <pkg>`) after an inline confirm on the row.
+   Phone: each row is a stacked card (pkg on top, two switches side by side, cooldown full width). Tablet+: a 5-column grid row `pkg | U0 | U999 | cooldown | remove` (CSS grid, not `<table>`, so it never overflows). Paging: 50 per page, "Show more" +50, hard cap 200 rendered rows (beyond that: "Refine the filter"); a filter change resets to 50; rows are built in a `DocumentFragment` [D6].
+5. **Never:** chips with remove (x) -> `appguard never rm <pkg>`; add field -> `appguard never add <pkg>`, package regex checked client-side (`^[A-Za-z0-9_.]+$`, <=128) before send; `Pick` opens the package picker in never mode. One global list (no per-user).
+6. **Recent kills:** `appguard kills 50` -> at most 50 rows `ts` (relative + absolute), `user`, `pkg`, `mode` chip (`kill`/`dry`), `result` chip (`ok` green / `fail` red), `cooldown_s`, `reason`. Header shows "Showing n of {total}". Empty: "No kills recorded yet." Refresh button; auto-refresh after Run once.
+
+**Package picker (in-sheet sub-view):** replaces the sheet body; a `Back` button returns and restores the previous body `scrollTop`. Not a second sheet. Modes: `target` (segmented user 0 / 999 -> `appguard packages --user N [--q substr]`, rows show `pkg` with `target`/`never` chips; tap -> `appguard targets add <pkg> u0=1 u999=0` for user 0 or `u0=0 u999=1` for 999) and `never` (`appguard packages --user 0`, tap -> `appguard never add <pkg>`). Search debounce 250 ms. Focus moves to the picker search on open and back to the opener on Back.
+
+**No nested sheets.** `KM.sheet` is single-instance, so every confirm inside the AppGuard sheet is an inline strip and the picker is a sub-view; `KM.confirm` is never called from inside the sheet [D11].
+
+**Accessibility:** inherited from `KM.sheet`: `role=dialog`, `aria-modal=true`, `aria-labelledby`, focus moves into the sheet, Tab focus trap, Escape closes, focus returns to the gear. In the picker sub-view the first Escape goes Back, the second closes. Switches keep `role=switch` + `aria-checked` + a per-row `aria-label`. Full-screen under 600 px. Every interactive element in `.ag-sheet` (switches, remove buttons, cooldown inputs, never-chip x, small buttons, picker rows, segmented buttons) is at least 44x44 CSS px.
 
 ## 6. Add: Install, Create, Import
 Add button opens one modal with a segmented control: **Install**, **Create**, **Import** (radio group). Modals are full-height sheets on phone, centered 560 px dialogs from 600 px.
@@ -171,12 +177,12 @@ Error code map (reused everywhere): `E_USAGE/E_UNKNOWN` "Unexpected request", `E
 Layout mode is `--km-layout` (phone <600, tablet 600-999, desktop >=1000), read by QA with `getComputedStyle(document.documentElement).getPropertyValue('--km-layout')`. **Hard rule at all ten:** `document.documentElement.scrollWidth - window.innerWidth === 0`; zero elements cross the viewport edge; no `<table>`, no fixed pixel widths above the viewport (`min-width:0` on grid/flex children, `overflow-wrap:anywhere` on pkg/id/path/hash/log text, `max-width:100%` on inputs). There are no intentional horizontal scroll strips.
 | Viewport | Mode | Changes |
 |---|---|---|
-| 360x640 | phone | 1 col, pad 12, bottom tab bar (icons + 11 px labels), card telemetry 2x2, primary action full width, icon buttons below, subtitle hidden, modals full-screen, AppGuard rows stacked. Short height: sticky header 52, bar 60, so ~528 px of content; modals scroll internally (`max-height:100dvh`), footer actions sticky |
+| 360x640 | phone | 1 col, pad 12, bottom tab bar (icons + 11 px labels), card telemetry 2x2, primary action full width, icon buttons below, subtitle hidden, modals and the AppGuard sheet full-screen, AppGuard rows stacked. Short height: sticky header 52, bar 60, so ~528 px of content; modals scroll internally (`max-height:100dvh`), footer actions sticky |
 | 390x844 | phone | same as 360, pad 16, labels 12 px |
 | 414x896 | phone | same as 390, action buttons show text + icon on one row (Start/Stop + Restart share a line) |
-| 768x1024 | tablet | top tabs, 2 card columns, pad 24, centered modals 560 px, AppGuard single column, matrix as 5-column grid rows, subtitle shown |
+| 768x1024 | tablet | top tabs, 2 card columns, pad 24, centered modals 560 px, AppGuard sheet up to 760 px, matrix as 5-column grid rows, subtitle shown |
 | 820x1180 | tablet | same as 768, pad 24, columns 2, larger vertical rhythm only (`--km-s5` gaps) |
-| 1024x1366 | desktop | AppGuard two panes (340 px + fluid), 3 card columns (`repeat(auto-fill,minmax(300px,1fr))`), pad 32; modals 560-640 px |
+| 1024x1366 | desktop | AppGuard sheet 760 px single column, 3 card columns (`repeat(auto-fill,minmax(300px,1fr))`), pad 32; modals 560-640 px |
 | 1280x800 | desktop | content max 1120 centered, 3 columns, header 60; short height, logs/kills panels capped at `max-height:calc(100dvh - 220px)` |
 | 1440x900 | desktop | same as 1280, wider gutters showing the ink grid |
 | 1920x1080 | desktop | content stays 1120 (no stretch), 3 columns, centered, 400+ px gutters each side |
@@ -190,11 +196,18 @@ Modals use `max-height:min(90dvh,720px)` on tablet+, `100dvh` on phone; internal
 - **Visual:** `:focus-visible` uses `--km-focus` (2 px ring, 3:1 against every surface); contrast at least 4.5:1 for text; targets at least 44 px; state never by color alone.
 - **Motion:** `prefers-reduced-motion: reduce` zeros all `--km-dur-*`, stops skeleton pulse, the mark pulse and the busy sweep (busy is then shown by label + static ring).
 
-## 13. CSP, bridge, polling, error surface
+## 13. CSP, bridge, polling, render, error surface
 - **CSP (identical in `index.html` meta and `config.json`):** `default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'`. No inline `<script>`, no `on*=` handlers, no `style=` attributes (classes, and CSSOM `el.style.x=` only), no `eval`, no external URLs, fonts, images, or fetch/XHR. Scripts are plain files in `js/`, loaded with `<script src defer>`. SVG icons are inline in the HTML or created with DOM APIs. Fallback if the KSU WebView blocks `'self'` styles: `style-src 'unsafe-inline'`, recorded as a deviation after T9.
 - **Bridge (`js/bridge.js`):** `ksu.exec(cmd, callbackName)`: a unique global callback per call (`__km_<seq>_<ts>`) receives `(errno, stdout, stderr)` and is deleted after use; a late callback after timeout hits a no-op. A promise wraps it and resolves `JSON.parse(stdout)` or rejects with `{kind:'nojson'|'timeout'|'nobridge', errno, stderr}`. Each call is blocking and returns stdout only at exit, so output stays under ~64 KB. Concurrency is capped at 3 with a FIFO queue; an identical in-flight command string is shared (de-duplicated); mutating commands are never de-duplicated and the card is locked by the UI (`busy`). Timeouts: reads 10 s, start/stop/restart/enable/disable 30 s, `once` 60 s, `install commit` and `delete --confirm` 45 s.
 - **Command builder:** `DM + ' ' + tokens`. Only tokens that match a fixed validator are interpolated: ids `^[a-z0-9][a-z0-9-]{1,30}$`, pkg `^[A-Za-z0-9_.]+$` (<=128), ints in range, `u0|u999=0|1`, `cooldown=<int>|default`, tokens `^t_[a-z0-9]+$`, jobs `^j_[a-z0-9]+$`, sha256 `^[a-f0-9]{64}$`. URLs and paths are validated (`^https` or `^/[A-Za-z0-9._/-]+\.zip$`) and single-quoted with `'` -> `'\''`; free text (name, start, stop) travels only as base64 (`btoa` of UTF-8 bytes). A failed validator throws before the bridge is called.
 - **Blocking call vs job:** everything is a blocking call except `install stage`, which returns a job; the UI polls `job <id>` every 1 s until `state != running`, max 10 min, and stops polling on tab close. Polling backs off to 3 s after 30 s.
+- **Render: fingerprint + in-place patch** [D12]. The Daemons panel keeps the last good `list` and a fingerprint (`daemons` without top-level `ts`, plus busy map, open details and error code). Unchanged fingerprint = no DOM write at all. Changed = reconcile by `data-id`: patch existing cards in place (text, attributes, classes, `disabled` only when different), create new ones, remove vanished ones, move a node only when out of order. The primary button changes label, icon and action on the same element so focus survives. Skeletons only when the list is empty. Window scroll and the focused element are preserved across every reconcile.
+- **Tab switch:** a panel reloads on activation only if its last successful load is 5 s old or older (or it never loaded). Header Refresh and explicit actions bypass the gate. No rendering into hidden panels: a hidden Daemons panel is marked dirty and reconciled on activation.
+- **Poll pause rules:** each poller is one `setTimeout` chain (no `setInterval`). The `list` tick runs only when the Daemons tab is active, `!document.hidden`, no modal or sheet is open, and no load is in flight. Becoming visible on a stale Daemons tab triggers one load. Logs auto-refresh runs only on the Logs tab, while visible, with auto on, and only when the log box is at the bottom (within 24 px); otherwise it pauses.
+- **Logs never yank scroll:** identical text = no write; if the user was at the bottom the box sticks to the bottom, otherwise `scrollTop` is left unchanged; the first load goes to the bottom. The source `<select>` is rebuilt only when the source list changes.
+- **Render error boundary:** every panel and section render (daemons list, logs, About blocks, each AppGuard section, the picker) runs inside a guard. A throw logs `console.warn` (name + message) and replaces only that host's content with a `.panel-error` (`E_RENDER`, short message, **Retry**). Shell, header, tabs and other panels stay usable; promise render paths are guarded too, so nothing escapes as an unhandled rejection.
+- **Caps:** logs at most 200 lines (client-side `slice(-200)`), kills at most 50 rows, targets 50 per page with a 200-row render cap. Lists are built in fragments; `scrollTop` is read once before writes (no read-after-write layout loops).
+- **No `backdrop-filter`** [D13]: the modal backdrop is a solid scrim (`--km-scrim`, alpha .78), no blur anywhere in the stylesheet.
 - **Error surface:** one `errorView(err)` maps `{kind|code}` to text and places it where the user acted (card strip, form banner, modal panel, tab panel). Toasts only confirm success (3 s, `aria-live`). Raw stderr is shown as text (`textContent`), capped at 200 characters. Nothing is swallowed: unparsable output is shown as `dm error`.
 
 ## 14. UI element -> `dm` command -> JSON fields
@@ -218,7 +231,7 @@ Modals use `max-height:min(90dvh,720px)` on tablet+, `100dvh` on phone; internal
 | Import confirm | `import <path> <b64kv>` | `id,script,enabled,source` |
 | Delete plan | `delete <id> --plan` | `plan.{stop,remove_dir,remove_wrapper,run_uninstall_hook,keeps}` |
 | Delete confirm | `delete <id> --confirm <id>` | `id,stopped,hook.{ran,exit},removed,unmanaged` |
-| AppGuard screen load | `appguard get` | `config.{interval_s,cooldown_s,dry_run}`, `never`, `targets[].{pkg,u0,u999,cooldown_s,shadowed}`, `counts`, `daemon`, `running_version`, `installed_version` |
+| AppGuard sheet load | `appguard get` | `config.{interval_s,cooldown_s,dry_run}`, `never`, `targets[].{pkg,u0,u999,cooldown_s,shadowed}`, `counts`, `daemon`, `running_version`, `installed_version` |
 | Interval / cooldown / dry-run | `appguard set interval\|cooldown\|dry <v>` | `key,value,msg` |
 | U0 / U999 switches, per-app cooldown | `appguard targets set <pkg> u0=.. u999=.. cooldown=..\|default` | `pkg,u0,u999,cooldown_s` |
 | Add app | `appguard targets add <pkg> [u0=1 u999=0 cooldown=N]` | `pkg,u0,u999,cooldown_s` |
@@ -236,4 +249,4 @@ Modals use `max-height:min(90dvh,720px)` on tablet+, `100dvh` on phone; internal
 Not in the UI in v1: `migrate` (lazy, runs on first `dm` call or boot) and the old unversioned `list` output; the UI never calls anything outside PLAN section 4.
 
 ## 15. Decisions summary
-D1 bottom tab bar on phone. D2 5 s visible-only polling. D3 Settings only for `deep-sleep-cool` (and a jump link for `appguard`). D4 disable on a running daemon asks stop-or-keep. D5 confirm before stopping `root-sshd`. D6 targets paged 50 at a time. D7 install Cancel during a job aborts the staged token afterward. D8 links are plain text, no anchors. D9 no optimistic UI, cards show busy until dm answers.
+D1 bottom tab bar on phone. D2 5 s visible-only polling. D3 Settings only for `deep-sleep-cool` and `appguard` (the latter opens the AppGuard settings sheet). D4 disable on a running daemon asks stop-or-keep. D5 confirm before stopping `root-sshd`. D6 targets paged 50 at a time. D7 install Cancel during a job aborts the staged token afterward. D8 links are plain text, no anchors. D9 no optimistic UI, cards show busy until dm answers. D10 AppGuard tab removed; tabs are Daemons / Logs / About and AppGuard lives behind its card gear (legacy `#appguard` lands on Daemons). D11 AppGuard settings are one `KM.sheet` with an in-sheet picker sub-view and inline confirm strips, because `KM.sheet` is single-instance and a nested sheet would close it. D12 render/poll strategy: fingerprint skip, in-place card patch by id, 5 s tab-switch gate, polls paused off-tab, when hidden or under a modal, per-panel error boundary with Retry. D13 `backdrop-filter` dropped and the scrim raised to .78, since a full-screen blur is a known WebView cost that cannot be measured tonight.

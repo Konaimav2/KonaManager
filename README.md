@@ -4,7 +4,7 @@ A small KernelSU/ReSukiSU module for managing root daemons on Android, with veri
 
 The module id stays `daemon-manager`, so it can update the existing install in place. All data under `/data/adb/daemon-manager`, the AppGuard lists, `deep-sleep-cool.conf`, and the scripts in `/data/adb/service.d` are preserved.
 
-![KonaManager desktop](tests/evidence/ui/1280x800.png)
+![KonaManager desktop](tests/evidence/ui-night/1280x800.png)
 
 ## What it does
 
@@ -24,7 +24,7 @@ The module id stays `daemon-manager`, so it can update the existing install in p
 
 ## Install / update
 
-1. Download `KonaManager-v2.0.0.zip` from the [Releases](https://github.com/Konaimav2/KonaManager/releases) page.
+1. Download `KonaManager-v2.1.0.zip` from the [Releases](https://github.com/Konaimav2/KonaManager/releases) page.
 2. Install it in KernelSU/ReSukiSU as a module update.
 3. Reboot or soft reboot when convenient. Running daemons are not restarted by the update.
 4. Open the module card, then **WebUI**.
